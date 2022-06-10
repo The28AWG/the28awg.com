@@ -1,3 +1,6 @@
 {
-  "_locale": "ru"
+  "_locale": "ru",
+  "toHomePage": "На главную",
+  "unknownPageTitle": "404",
+  "title": "the28awg"
 }

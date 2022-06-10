@@ -59,6 +59,36 @@ class S {
       args: [],
     );
   }
+
+  /// `На главную`
+  String get toHomePage {
+    return Intl.message(
+      'На главную',
+      name: 'toHomePage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `404`
+  String get unknownPageTitle {
+    return Intl.message(
+      '404',
+      name: 'unknownPageTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `the28awg`
+  String get title {
+    return Intl.message(
+      'the28awg',
+      name: 'title',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

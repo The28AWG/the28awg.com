@@ -1,0 +1,4 @@
+enum InputBorderEnum {
+  underline,
+  outline,
+}
