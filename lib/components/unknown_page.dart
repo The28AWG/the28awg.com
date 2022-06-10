@@ -21,7 +21,7 @@ class UnknownPage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: OutlinedButton(
-                      onPressed: () => context.router.home(),
+                      onPressed: () => context.go.home(),
                       child: context.ln.toHomePage.t(),
                     ),
                   ),

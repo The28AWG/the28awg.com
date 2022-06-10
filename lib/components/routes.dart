@@ -21,6 +21,19 @@ part 'routes.gr.dart';
 )
 class Routes extends _$Routes {}
 
-extension DefaultRoutes on StackRouter {
+class Go {
+  final BuildContext context;
+
+  Go(this.context);
+
+  Future<T?> push<T extends Object?>(
+    PageRouteInfo route,
+  ) =>
+      this.context.router.push(route);
+
   void home() => push(const HomeRoute());
+}
+
+extension GoExtension on BuildContext {
+  Go get go => Go(this);
 }
