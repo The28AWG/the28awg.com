@@ -3,8 +3,7 @@ import 'package:the28awg/components/pages.dart';
 import 'package:the28awg/components/unknown_page.dart';
 
 export 'package:auto_route/auto_route.dart';
-
-part 'routes.gr.dart';
+export 'package:the28awg/components/routes.gr.dart';
 
 @MaterialAutoRouter(
   replaceInRouteName: 'Page,Route',
@@ -19,7 +18,7 @@ part 'routes.gr.dart';
     ),
   ],
 )
-class Routes extends _$Routes {}
+class $Routes {}
 
 class Go {
   final BuildContext context;
@@ -27,7 +26,7 @@ class Go {
   Go(this.context);
 
   Future<T?> push<T extends Object?>(
-    PageRouteInfo route,
+    PageRouteInfo<void> route,
   ) =>
       this.context.router.push(route);
 

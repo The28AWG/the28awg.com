@@ -1,21 +1,19 @@
 import 'package:flutter/foundation.dart';
 import 'package:the28awg/components/components.dart';
-import 'package:the28awg/components/theme/model/input_border_enum.dart';
-import 'package:the28awg/components/theme/model/visual_density_enum.dart';
 import 'package:the28awg/components/theme/theme_builder.dart';
 
 class ThemeController with ChangeNotifier {
   late ThemeBuilder builder = ThemeBuilder(this);
   static const ThemeMode defaultThemeMode = ThemeMode.system;
-  static const VisualDensityEnum defaultVisualDensityEnum =
-      VisualDensityEnum.adaptivePlatformDensity;
-  static const InputBorderEnum defaultInputBorderEnum = InputBorderEnum.outline;
+  static VisualDensity defaultVisualDensity =
+      VisualDensity.adaptivePlatformDensity;
+  static Color defaultColor = const Color(0xFF8E24AA);
 
   Future<void> loadAll() async {
     _themeMode = defaultThemeMode;
     _platform = defaultTargetPlatform;
-    _visualDensityEnum = defaultVisualDensityEnum;
-    _inputBorderEnum = defaultInputBorderEnum;
+    _visualDensity = defaultVisualDensity;
+    _color = defaultColor;
   }
 
   Future<void> resetAllToDefaults() async {
@@ -24,14 +22,11 @@ class ThemeController with ChangeNotifier {
       defaultTargetPlatform,
       false,
     );
-    await setVisualDensityEnum(
-      defaultVisualDensityEnum,
+    await setVisualDensity(
+      defaultVisualDensity,
       false,
     );
-    await setInputBorderEnum(
-      defaultInputBorderEnum,
-      false,
-    );
+    await setColor(defaultColor);
     notifyListeners();
   }
 
@@ -71,35 +66,35 @@ class ThemeController with ChangeNotifier {
     if (notify) notifyListeners();
   }
 
-  late VisualDensityEnum _visualDensityEnum;
+  late VisualDensity _visualDensity;
 
-  VisualDensityEnum get visualDensityEnum => _visualDensityEnum;
+  VisualDensity get visualDensity => _visualDensity;
 
-  set visualDensityEnum(VisualDensityEnum value) => setVisualDensityEnum(value);
+  set visualDensityEnum(VisualDensity value) => setVisualDensity(value);
 
-  Future<void> setVisualDensityEnum(
-    VisualDensityEnum? value, [
+  Future<void> setVisualDensity(
+    VisualDensity? value, [
     bool notify = true,
   ]) async {
     if (value == null) return;
-    if (value == _visualDensityEnum) return;
-    _visualDensityEnum = value;
+    if (value == _visualDensity) return;
+    _visualDensity = value;
     if (notify) notifyListeners();
   }
 
-  late InputBorderEnum _inputBorderEnum;
+  late Color _color;
 
-  InputBorderEnum get inputBorderEnum => _inputBorderEnum;
+  Color get color => _color;
 
-  set inputBorderEnum(InputBorderEnum value) => setInputBorderEnum(value);
+  set color(Color value) => setColor(value);
 
-  Future<void> setInputBorderEnum(
-    InputBorderEnum? value, [
+  Future<void> setColor(
+    Color? value, [
     bool notify = true,
   ]) async {
     if (value == null) return;
-    if (value.index == _inputBorderEnum.index) return;
-    _inputBorderEnum = value;
+    if (value == _color) return;
+    _color = value;
     if (notify) notifyListeners();
   }
 }

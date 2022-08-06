@@ -1,4 +1,5 @@
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:the28awg/components/components.dart';
 
 class App extends StatefulWidget {
@@ -10,6 +11,14 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   final _routes = Routes();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => FlutterNativeSplash.remove(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(

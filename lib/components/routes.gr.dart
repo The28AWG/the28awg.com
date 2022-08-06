@@ -10,41 +10,46 @@
 //
 // ignore_for_file: type=lint
 
-part of 'routes.dart';
+import 'package:auto_route/auto_route.dart' as _i3;
+import 'package:flutter/material.dart' as _i4;
 
-class _$Routes extends RootStackRouter {
-  _$Routes([GlobalKey<NavigatorState>? navigatorKey]) : super(navigatorKey);
+import 'pages.dart' as _i2;
+import 'unknown_page.dart' as _i1;
+
+class Routes extends _i3.RootStackRouter {
+  Routes([_i4.GlobalKey<_i4.NavigatorState>? navigatorKey])
+      : super(navigatorKey);
 
   @override
-  final Map<String, PageFactory> pagesMap = {
+  final Map<String, _i3.PageFactory> pagesMap = {
     UnknownRoute.name: (routeData) {
-      return MaterialPageX<dynamic>(
-          routeData: routeData, child: const UnknownPage());
+      return _i3.MaterialPageX<dynamic>(
+          routeData: routeData, child: const _i1.UnknownPage());
     },
     HomeRoute.name: (routeData) {
-      return MaterialPageX<dynamic>(
-          routeData: routeData, child: const HomePage());
+      return _i3.MaterialPageX<dynamic>(
+          routeData: routeData, child: const _i2.HomePage());
     }
   };
 
   @override
-  List<RouteConfig> get routes => [
-        RouteConfig(UnknownRoute.name, path: '/*'),
-        RouteConfig(HomeRoute.name, path: '/')
+  List<_i3.RouteConfig> get routes => [
+        _i3.RouteConfig(UnknownRoute.name, path: '/*'),
+        _i3.RouteConfig(HomeRoute.name, path: '/')
       ];
 }
 
 /// generated route for
-/// [UnknownPage]
-class UnknownRoute extends PageRouteInfo<void> {
+/// [_i1.UnknownPage]
+class UnknownRoute extends _i3.PageRouteInfo<void> {
   const UnknownRoute() : super(UnknownRoute.name, path: '/*');
 
   static const String name = 'UnknownRoute';
 }
 
 /// generated route for
-/// [HomePage]
-class HomeRoute extends PageRouteInfo<void> {
+/// [_i2.HomePage]
+class HomeRoute extends _i3.PageRouteInfo<void> {
   const HomeRoute() : super(HomeRoute.name, path: '/');
 
   static const String name = 'HomeRoute';

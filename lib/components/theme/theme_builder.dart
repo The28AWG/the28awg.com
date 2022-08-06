@@ -1,65 +1,652 @@
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:the28awg/components/components.dart';
-import 'package:the28awg/components/theme/model/input_border_enum.dart';
-import 'package:the28awg/components/theme/model/visual_density_enum.dart';
 
 class ThemeBuilder {
   final ThemeController _controller;
 
   ThemeBuilder(ThemeController controller) : _controller = controller;
 
-  VisualDensity get visualDensity {
-    switch (_controller.visualDensityEnum) {
-      case VisualDensityEnum.comfortable:
-        return VisualDensity.comfortable;
-      case VisualDensityEnum.compact:
-        return VisualDensity.compact;
-      case VisualDensityEnum.standard:
-        return VisualDensity.standard;
-      default:
-        return VisualDensity.adaptivePlatformDensity;
+  static String? get font => GoogleFonts.notoSans().fontFamily;
+
+  ThemeData get light => theme(
+        brightness: Brightness.light,
+        baseColor: Colors.white,
+        textColor: Colors.black,
+        systemOverlayStyle: SystemUiOverlayStyle.light,
+        fontFamily: font,
+      );
+
+  ThemeData get dark => theme(
+        brightness: Brightness.dark,
+        baseColor: Colors.black,
+        textColor: Colors.white,
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
+        fontFamily: font,
+      );
+
+  ThemeData theme({
+    required Brightness brightness,
+    required Color baseColor,
+    required Color textColor,
+    required SystemUiOverlayStyle systemOverlayStyle,
+    String? fontFamily,
+  }) {
+    final MaterialColor primarySwatch = createPrimarySwatch(_controller.color);
+    ColorScheme colorScheme = ColorScheme.fromSwatch(
+      accentColor: primarySwatch,
+      primarySwatch: primarySwatch,
+      brightness: brightness,
+    );
+    final bool isDark = colorScheme.brightness == Brightness.dark;
+    final Typography effectiveTypography = Typography.material2018(
+      platform: _controller.platform,
+    );
+    TextTheme defTextTheme =
+        isDark ? effectiveTypography.white : effectiveTypography.black;
+
+    final bool primaryIsDark =
+        ThemeData.estimateBrightnessForColor(colorScheme.primary) ==
+            Brightness.dark;
+    TextTheme defPrimaryTextTheme =
+        primaryIsDark ? effectiveTypography.white : effectiveTypography.black;
+    if (fontFamily != null) {
+      defTextTheme = defTextTheme.apply(
+        fontFamily: fontFamily,
+      );
+      defPrimaryTextTheme = defPrimaryTextTheme.apply(
+        fontFamily: fontFamily,
+      );
     }
+    final Brightness appBarBrightness =
+        ThemeData.estimateBrightnessForColor(baseColor);
+    return ThemeData(
+      extensions: [
+        _Timestamp(DateTime.now().millisecond),
+      ],
+      useMaterial3: true,
+      visualDensity: _controller.visualDensity,
+      brightness: brightness,
+      toggleableActiveColor: primarySwatch,
+      primarySwatch: primarySwatch,
+      scaffoldBackgroundColor: baseColor,
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: baseColor,
+        selectedItemColor: primarySwatch,
+      ),
+      appBarTheme: AppBarTheme(
+        color: baseColor,
+        foregroundColor: baseColor,
+        iconTheme: IconThemeData(color: textColor),
+        actionsIconTheme: IconThemeData(color: textColor),
+        elevation: 0,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarBrightness: appBarBrightness,
+          statusBarIconBrightness: appBarBrightness == Brightness.dark
+              ? Brightness.light
+              : Brightness.dark,
+          systemNavigationBarColor: const Color(0xFF000000),
+          systemNavigationBarIconBrightness: Brightness.dark,
+          systemNavigationBarDividerColor: null,
+        ),
+        toolbarTextStyle: TextStyle(
+          color: textColor,
+          fontSize: 14.0,
+          fontWeight: FontWeight.w400,
+          letterSpacing: 0.25,
+        ),
+        titleTextStyle: TextStyle(
+          color: textColor,
+          fontSize: 20.0,
+          fontWeight: FontWeight.w500,
+          letterSpacing: 0.15,
+        ),
+      ),
+      typography: Typography.material2021(
+        platform: _controller.platform,
+      ),
+      colorScheme: colorScheme,
+      inputDecorationTheme: inputDecorationTheme(
+        colorScheme: colorScheme,
+      ),
+      chipTheme: chipTheme(
+        colorScheme: colorScheme,
+        labelStyle: defTextTheme.button!,
+      ),
+      cardTheme: cardTheme(),
+      popupMenuTheme: popupMenuTheme(),
+      dialogTheme: dialogTheme(),
+      bottomSheetTheme: bottomSheetTheme(),
+      toggleButtonsTheme: toggleButtonsTheme(
+        colorScheme: colorScheme,
+        visualDensity: _controller.visualDensity,
+      ),
+      textButtonTheme: textButtonTheme(
+        colorScheme: colorScheme,
+      ),
+      elevatedButtonTheme: elevatedButtonTheme(
+        colorScheme: colorScheme,
+      ),
+      outlinedButtonTheme: outlinedButtonTheme(
+        colorScheme: colorScheme,
+      ),
+    );
   }
 
-  InputBorder get inputBorder =>
-      _controller.inputBorderEnum == InputBorderEnum.underline
-          ? const UnderlineInputBorder()
-          : const OutlineInputBorder();
+  static InputDecorationTheme inputDecorationTheme({
+    required final ColorScheme colorScheme,
+    final double? radius,
+    final bool filled = true,
+    Color? fillColor,
+    final double focusedBorderWidth = 1,
+    final double unfocusedBorderWidth = 0.5,
+    final double gapPadding = 4,
+    final bool unfocusedHasBorder = true,
+  }) {
+    final Color baseColor = colorScheme.primary;
 
-  ThemeData get light => _themeData(Brightness.light);
+    fillColor = fillColor ??
+        (colorScheme.brightness == Brightness.dark
+            ? baseColor.withAlpha(0x14)
+            : baseColor.withAlpha(0x0D));
 
-  ThemeData get dark => _themeData(Brightness.dark);
+    return InputDecorationTheme(
+      filled: true,
+      fillColor: fillColor,
+      hoverColor: baseColor.withAlpha(0x0D),
+      focusColor: baseColor.withAlpha(0x26),
+      focusedBorder: OutlineInputBorder(
+        gapPadding: gapPadding,
+        borderRadius: BorderRadius.all(Radius.circular(radius ?? 20)),
+        borderSide: BorderSide(
+          color: baseColor,
+          width: focusedBorderWidth,
+        ),
+      ),
+      enabledBorder: OutlineInputBorder(
+        gapPadding: gapPadding,
+        borderRadius: BorderRadius.all(Radius.circular(radius ?? 20)),
+        borderSide: unfocusedHasBorder
+            ? BorderSide(
+                color: baseColor.withAlpha(0xA7),
+                width: unfocusedBorderWidth,
+              )
+            : BorderSide.none,
+      ),
+      disabledBorder: OutlineInputBorder(
+        gapPadding: gapPadding,
+        borderRadius: BorderRadius.all(Radius.circular(radius ?? 20)),
+        borderSide: unfocusedHasBorder
+            ? BorderSide(
+                color: blendAlpha(baseColor, colorScheme.onSurface, 0x66)
+                    .withAlpha(0x31),
+                width: unfocusedBorderWidth,
+              )
+            : BorderSide.none,
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        gapPadding: gapPadding,
+        borderRadius: BorderRadius.all(Radius.circular(radius ?? 20)),
+        borderSide: BorderSide(
+          color: colorScheme.error,
+          width: focusedBorderWidth,
+        ),
+      ),
+      errorBorder: OutlineInputBorder(
+        gapPadding: gapPadding,
+        borderRadius: BorderRadius.all(Radius.circular(radius ?? 20)),
+        borderSide: BorderSide(
+          color: colorScheme.error.withAlpha(0xA7),
+          width: unfocusedBorderWidth,
+        ),
+      ),
+    );
+  }
 
-  ThemeData _themeData(
-    Brightness brightness,
-  ) =>
-      ThemeData(
-        extensions: [
-          Now(DateTime.now().millisecond),
-        ],
-        brightness: brightness,
-        platform: _controller.platform,
-        visualDensity: visualDensity,
-        inputDecorationTheme: InputDecorationTheme(
-          border: inputBorder,
+  static ChipThemeData chipTheme({
+    required final ColorScheme colorScheme,
+    required TextStyle labelStyle,
+    final double? radius,
+  }) {
+    final Color baseColor = colorScheme.primary;
+    final Color foreground = blendAlpha(
+      baseColor,
+      colorScheme.onSurface,
+      0x7F,
+    );
+    final Color selectedBackgroundColor = blendAlpha(
+      baseColor,
+      colorScheme.surface,
+      0x96,
+    );
+    final TextStyle effectiveLabelStyle = labelStyle.copyWith(
+      color: foreground,
+    );
+    return ChipThemeData(
+      brightness: ThemeData.estimateBrightnessForColor(colorScheme.primary),
+      padding: const EdgeInsets.all(4),
+      backgroundColor: blendAlpha(
+        baseColor,
+        colorScheme.surface,
+        0xCC,
+      ),
+      selectedColor: selectedBackgroundColor,
+      secondarySelectedColor: selectedBackgroundColor,
+      checkmarkColor: foreground,
+      deleteIconColor: baseColor,
+      disabledColor: blendAlpha(
+        baseColor,
+        colorScheme.onSurface,
+        0x66,
+      ).withAlpha(0x31),
+      labelStyle: effectiveLabelStyle,
+      secondaryLabelStyle: effectiveLabelStyle,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(
+          Radius.circular(radius ?? 8),
+        ),
+      ),
+    );
+  }
+
+  static CardTheme cardTheme({
+    final double? radius,
+    final double elevation = 0,
+    final Clip clipBehavior = Clip.antiAlias,
+  }) =>
+      CardTheme(
+        clipBehavior: clipBehavior,
+        elevation: elevation,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(radius ?? 12),
+          ),
         ),
       );
+
+  static PopupMenuThemeData popupMenuTheme({
+    final double? radius,
+    final double elevation = 3,
+
+    /// The background color of the popup menu.
+    final Color? color,
+  }) =>
+      PopupMenuThemeData(
+        elevation: elevation,
+        color: color,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(radius ?? 10),
+          ),
+        ),
+      );
+
+  static DialogTheme dialogTheme({
+    final double? radius,
+    final double? elevation = 10,
+    final Color? backgroundColor,
+  }) =>
+      DialogTheme(
+        elevation: elevation,
+        backgroundColor: backgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(radius ?? 28),
+          ),
+        ),
+      );
+
+  static BottomSheetThemeData bottomSheetTheme({
+    final double elevation = 4,
+    final double modalElevation = 8,
+    final Clip clipBehavior = Clip.antiAlias,
+  }) =>
+      BottomSheetThemeData(
+        clipBehavior: clipBehavior,
+        elevation: elevation,
+        modalElevation: modalElevation,
+      );
+
+  static ToggleButtonsThemeData toggleButtonsTheme({
+    required final ColorScheme colorScheme,
+    final double? radius,
+    final double borderWidth = 0.5,
+    final Size minButtonSize = const Size(40, 40),
+    VisualDensity? visualDensity,
+  }) {
+    visualDensity = visualDensity ?? VisualDensity.adaptivePlatformDensity;
+    return ToggleButtonsThemeData(
+      borderWidth: borderWidth,
+      selectedColor: colorScheme.onPrimary.withAlpha(0xE5),
+      color: colorScheme.primary,
+      fillColor: blendAlpha(
+        colorScheme.primary,
+        Colors.white,
+        0x19,
+      ),
+      borderColor: colorScheme.primary.withAlpha(
+        0xA7,
+      ),
+      selectedBorderColor: blendAlpha(
+        colorScheme.primary,
+        Colors.white,
+        0x19,
+      ),
+      hoverColor: blendAlpha(
+        colorScheme.primary,
+        Colors.white,
+        0x40 + 0x19,
+      ).withAlpha(0x19),
+      focusColor: blendAlpha(
+        colorScheme.primary,
+        Colors.white,
+        0x4C + 0x19,
+      ).withAlpha(0x4C),
+      highlightColor: blendAlpha(
+        colorScheme.primary,
+        Colors.white,
+        0x40 + 0x19,
+      ).withAlpha(0x19),
+      splashColor: blendAlpha(
+        colorScheme.primary,
+        Colors.white,
+        0x1F + 0x19,
+      ).withAlpha(0x33),
+      disabledColor: blendAlpha(
+        colorScheme.primary,
+        colorScheme.onSurface,
+        0x66,
+      ).withAlpha(0x5E),
+      disabledBorderColor: blendAlpha(
+        colorScheme.primary,
+        colorScheme.onSurface,
+        0x66,
+      ).withAlpha(0x31),
+      borderRadius: BorderRadius.circular(radius ?? 20),
+      constraints: BoxConstraints(
+        minWidth: minButtonSize.width -
+            borderWidth * 2 +
+            visualDensity.baseSizeAdjustment.dx,
+        minHeight: minButtonSize.height -
+            borderWidth * 2 +
+            visualDensity.baseSizeAdjustment.dy,
+      ),
+    );
+  }
+
+  static TextButtonThemeData textButtonTheme({
+    required final ColorScheme colorScheme,
+    final double? radius,
+    final EdgeInsetsGeometry? padding,
+    final Size minButtonSize = const Size(40, 40),
+  }) =>
+      TextButtonThemeData(
+        style: TextButton.styleFrom(
+          minimumSize: minButtonSize,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(radius ?? 20),
+            ),
+          ), // buttonShape,
+          padding: padding,
+        ).copyWith(
+          foregroundColor: MaterialStateProperty.resolveWith<Color>(
+            (Set<MaterialState> states) {
+              if (states.contains(MaterialState.disabled)) {
+                return blendAlpha(
+                  colorScheme.primary,
+                  colorScheme.onSurface,
+                  0x66,
+                ).withAlpha(0x5E);
+              }
+              return colorScheme.primary;
+            },
+          ),
+          overlayColor: MaterialStateProperty.resolveWith<Color>(
+            (Set<MaterialState> states) {
+              if (states.contains(MaterialState.hovered)) {
+                return colorScheme.primary.withAlpha(0x0D);
+              }
+              if (states.contains(MaterialState.focused)) {
+                return colorScheme.primary.withAlpha(0x26);
+              }
+              if (states.contains(MaterialState.pressed)) {
+                return colorScheme.primary.withAlpha(0x33);
+              }
+              return Colors.transparent;
+            },
+          ),
+        ),
+      );
+
+  /// An opinionated [ElevatedButtonThemeData] theme.
+  ///
+  /// Requires a [ColorScheme] in [colorscheme]. The color scheme would
+  /// typically be equal the color scheme also used to define the color scheme
+  /// for your app theme.
+  ///
+  /// The button [elevation] defaults to 1 [kElevatedButtonElevation], making
+  /// the elevated button a bit more flat. Flutter SDK ElevatedButton
+  /// defaults to elevation 2.
+  ///
+  /// The adjustable button corner [radius] defaults to 20. This is the new
+  /// default in M3, Flutter SDK M2 defaults to 4.
+  static ElevatedButtonThemeData elevatedButtonTheme({
+    /// Typically the same `ColorScheme` that is also used for your `ThemeData`.
+    required final ColorScheme colorScheme,
+    final double? radius,
+    final double elevation = 1,
+
+    /// Padding for the button theme.
+    ///
+    /// Defaults to null and uses `styleFrom` constructors default padding.
+    ///
+    /// M3 has more horizontal padding 24dp, but the tighter default padding
+    /// in M2 that is 16dp looks fine as well when using stadium borders
+    /// as in M3.
+    /// Making the custom scalable padding and separate one for icon
+    /// versions is rather involved, so sticking to defaults, but exposing the
+    /// padding property for future or external use.
+    final EdgeInsetsGeometry? padding,
+    final Size minButtonSize = const Size(40, 40),
+  }) =>
+      ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          minimumSize: minButtonSize,
+          padding: padding,
+          elevation: elevation,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(radius ?? 20),
+            ),
+          ), //buttonShape,
+        ).copyWith(
+          foregroundColor: MaterialStateProperty.resolveWith<Color>(
+            (Set<MaterialState> states) {
+              if (states.contains(MaterialState.disabled)) {
+                return blendAlpha(
+                  colorScheme.primary,
+                  colorScheme.onSurface,
+                  0x66,
+                ).withAlpha(0x5E);
+              }
+              return colorScheme.onPrimary;
+            },
+          ),
+          backgroundColor: MaterialStateProperty.resolveWith<Color>(
+            (Set<MaterialState> states) {
+              if (states.contains(MaterialState.disabled)) {
+                return blendAlpha(
+                  colorScheme.primary,
+                  colorScheme.onSurface,
+                  0x66,
+                ).withAlpha(0x31);
+              }
+              return colorScheme.primary;
+            },
+          ),
+          overlayColor: MaterialStateProperty.resolveWith<Color>(
+            (Set<MaterialState> states) {
+              if (states.contains(MaterialState.hovered)) {
+                return colorScheme.onPrimary.withAlpha(0x0D);
+              }
+              if (states.contains(MaterialState.focused)) {
+                return colorScheme.onPrimary.withAlpha(0x26);
+              }
+              if (states.contains(MaterialState.pressed)) {
+                return colorScheme.onPrimary.withAlpha(0x33);
+              }
+              return Colors.transparent;
+            },
+          ),
+        ),
+      );
+
+  static OutlinedButtonThemeData outlinedButtonTheme({
+    required final ColorScheme colorScheme,
+    final double? radius,
+    final double pressedOutlineWidth = 1.0,
+    final double outlineWidth = 0.5,
+
+    /// Padding for the button theme.
+    ///
+    /// Defaults to null and uses `styleFrom` constructors default padding.
+    ///
+    /// M3 has more horizontal padding 24dp, but the tighter default padding
+    /// in M2 that is 16dp looks fine as well when using stadium borders
+    /// as in M3.
+    /// Making the custom scalable padding and separate one for icon
+    /// versions is rather involved, so sticking to defaults, but exposing the
+    /// padding property for future or external use.
+    final EdgeInsetsGeometry? padding,
+    final Size minButtonSize = const Size(40, 40),
+  }) =>
+      OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          minimumSize: minButtonSize,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(radius ?? 20),
+            ),
+          ), //buttonShape,
+          padding: padding,
+        ).copyWith(
+          foregroundColor: MaterialStateProperty.resolveWith<Color>(
+            (Set<MaterialState> states) {
+              if (states.contains(MaterialState.disabled)) {
+                return blendAlpha(
+                  colorScheme.primary,
+                  colorScheme.onSurface,
+                  0x66,
+                ).withAlpha(0x5E);
+              }
+              return colorScheme.primary;
+            },
+          ),
+          overlayColor: MaterialStateProperty.resolveWith<Color>(
+            (Set<MaterialState> states) {
+              if (states.contains(MaterialState.hovered)) {
+                return colorScheme.primary.withAlpha(0x0D);
+              }
+              if (states.contains(MaterialState.focused)) {
+                return colorScheme.primary.withAlpha(0x26);
+              }
+              if (states.contains(MaterialState.pressed)) {
+                return colorScheme.primary.withAlpha(0x33);
+              }
+              return Colors.transparent;
+            },
+          ),
+          side: MaterialStateProperty.resolveWith<BorderSide?>(
+            (final Set<MaterialState> states) {
+              if (states.contains(MaterialState.disabled)) {
+                return BorderSide(
+                  color: blendAlpha(
+                    colorScheme.primary,
+                    colorScheme.onSurface,
+                    0x66,
+                  ).withAlpha(0x31),
+                  width: outlineWidth,
+                );
+              }
+              if (states.contains(MaterialState.error)) {
+                return BorderSide(
+                  color: colorScheme.error,
+                  width: pressedOutlineWidth,
+                );
+              }
+              if (states.contains(MaterialState.pressed)) {
+                return BorderSide(
+                  color: colorScheme.primary,
+                  width: pressedOutlineWidth,
+                );
+              }
+              return BorderSide(
+                color: colorScheme.primary.withAlpha(0xA7),
+                width: outlineWidth,
+              );
+            },
+          ),
+        ),
+      );
+
+  static Color blendAlpha(
+    final Color base,
+    final Color input, [
+    final int alpha = 0x0A,
+  ]) {
+    if (alpha <= 0) return base;
+    if (alpha >= 255) return input;
+    return Color.alphaBlend(input.withAlpha(alpha), base);
+  }
+
+  static MaterialColor createPrimarySwatch(final Color color) {
+    const List<double> strengths = [
+      0.05,
+      0.1,
+      0.2,
+      0.3,
+      0.4,
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+    ];
+    final Map<int, Color> swatch = <int, Color>{};
+    final int r = color.red;
+    final int g = color.green;
+    final int b = color.blue;
+    for (final double strength in strengths) {
+      final double ds = 0.5 - strength;
+      swatch[(strength * 1000).round()] = Color.fromRGBO(
+        r + ((ds < 0 ? r : (255 - r)) * ds).round(),
+        g + ((ds < 0 ? g : (255 - g)) * ds).round(),
+        b + ((ds < 0 ? b : (255 - b)) * ds).round(),
+        1,
+      );
+    }
+    return MaterialColor(color.value, swatch);
+  }
 }
 
-class Now extends ThemeExtension<Now> {
+class _Timestamp extends ThemeExtension<_Timestamp> {
   final int now;
 
-  Now(this.now);
+  _Timestamp(this.now);
 
   @override
-  ThemeExtension<Now> copyWith({
+  ThemeExtension<_Timestamp> copyWith({
     int? now,
   }) {
-    return Now(now ?? this.now);
+    return _Timestamp(now ?? this.now);
   }
 
   @override
-  ThemeExtension<Now> lerp(ThemeExtension<Now>? other, double t) {
-    if (other is! Now) {
+  ThemeExtension<_Timestamp> lerp(ThemeExtension<_Timestamp>? other, double t) {
+    if (other is! _Timestamp) {
       return this;
     }
     return this;
