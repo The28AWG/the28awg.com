@@ -15,6 +15,9 @@ export 'package:the28awg/components/routes.gr.dart';
     AutoRoute(
       path: '/',
       page: HomePage,
+      guards: [
+        AuthGuard,
+      ],
     ),
   ],
 )
@@ -35,4 +38,14 @@ class Go {
 
 extension GoExtension on BuildContext {
   Go get go => Go(this);
+}
+
+class AuthGuard extends AutoRouteGuard {
+  @override
+  void onNavigation(
+    NavigationResolver resolver,
+    StackRouter router,
+  ) {
+    resolver.next(true);
+  }
 }

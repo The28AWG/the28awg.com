@@ -11,31 +11,24 @@ class ThemeBuilder {
 
   ThemeData get light => theme(
         brightness: Brightness.light,
-        baseColor: Colors.white,
-        textColor: Colors.black,
         systemOverlayStyle: SystemUiOverlayStyle.light,
         fontFamily: font,
       );
 
   ThemeData get dark => theme(
         brightness: Brightness.dark,
-        baseColor: Colors.black,
-        textColor: Colors.white,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
         fontFamily: font,
       );
 
   ThemeData theme({
     required Brightness brightness,
-    required Color baseColor,
-    required Color textColor,
     required SystemUiOverlayStyle systemOverlayStyle,
     String? fontFamily,
   }) {
     final MaterialColor primarySwatch = createPrimarySwatch(_controller.color);
-    ColorScheme colorScheme = ColorScheme.fromSwatch(
-      accentColor: primarySwatch,
-      primarySwatch: primarySwatch,
+    ColorScheme colorScheme = ColorScheme.fromSeed(
+      seedColor: _controller.color,
       brightness: brightness,
     );
     final bool isDark = colorScheme.brightness == Brightness.dark;
@@ -59,27 +52,27 @@ class ThemeBuilder {
       );
     }
     final Brightness appBarBrightness =
-        ThemeData.estimateBrightnessForColor(baseColor);
+        ThemeData.estimateBrightnessForColor(colorScheme.surface);
     return ThemeData(
       extensions: [
         _Timestamp(DateTime.now().millisecond),
       ],
       useMaterial3: true,
-      visualDensity: _controller.visualDensity,
+      visualDensity: VisualDensity.adaptivePlatformDensity,
       brightness: brightness,
       toggleableActiveColor: primarySwatch,
       primarySwatch: primarySwatch,
-      scaffoldBackgroundColor: baseColor,
+      scaffoldBackgroundColor: colorScheme.surface,
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         type: BottomNavigationBarType.fixed,
-        backgroundColor: baseColor,
+        backgroundColor: colorScheme.surface,
         selectedItemColor: primarySwatch,
       ),
       appBarTheme: AppBarTheme(
-        color: baseColor,
-        foregroundColor: baseColor,
-        iconTheme: IconThemeData(color: textColor),
-        actionsIconTheme: IconThemeData(color: textColor),
+        color: colorScheme.surface,
+        foregroundColor: colorScheme.surface,
+        iconTheme: IconThemeData(color: colorScheme.primary),
+        actionsIconTheme: IconThemeData(color: colorScheme.primary),
         elevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
@@ -92,13 +85,13 @@ class ThemeBuilder {
           systemNavigationBarDividerColor: null,
         ),
         toolbarTextStyle: TextStyle(
-          color: textColor,
+          color: colorScheme.onSurface,
           fontSize: 14.0,
           fontWeight: FontWeight.w400,
           letterSpacing: 0.25,
         ),
         titleTextStyle: TextStyle(
-          color: textColor,
+          color: colorScheme.onSurface,
           fontSize: 20.0,
           fontWeight: FontWeight.w500,
           letterSpacing: 0.15,
@@ -121,7 +114,6 @@ class ThemeBuilder {
       bottomSheetTheme: bottomSheetTheme(),
       toggleButtonsTheme: toggleButtonsTheme(
         colorScheme: colorScheme,
-        visualDensity: _controller.visualDensity,
       ),
       textButtonTheme: textButtonTheme(
         colorScheme: colorScheme,
@@ -131,6 +123,16 @@ class ThemeBuilder {
       ),
       outlinedButtonTheme: outlinedButtonTheme(
         colorScheme: colorScheme,
+      ),
+      iconTheme: IconThemeData(
+        color: colorScheme.onPrimary,
+      ),
+      primaryIconTheme: IconThemeData(
+        color: blendAlpha(
+          colorScheme.primary,
+          colorScheme.onPrimary,
+          0x87,
+        ),
       ),
     );
   }
@@ -319,7 +321,11 @@ class ThemeBuilder {
     visualDensity = visualDensity ?? VisualDensity.adaptivePlatformDensity;
     return ToggleButtonsThemeData(
       borderWidth: borderWidth,
-      selectedColor: colorScheme.onPrimary.withAlpha(0xE5),
+      selectedColor: blendAlpha(
+        colorScheme.primary,
+        colorScheme.onPrimary,
+        0x87,
+      ),
       color: colorScheme.primary,
       fillColor: blendAlpha(
         colorScheme.primary,

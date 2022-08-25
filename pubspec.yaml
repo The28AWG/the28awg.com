@@ -16,30 +16,33 @@ dependencies:
   cupertino_icons: ^1.0.5
   path_to_regexp: ^0.4.0
   cyclop: ^0.5.2
-  flutter_bloc: ^8.0.1
+  flutter_bloc: ^8.1.1
   path_provider: ^2.0.11
-  equatable: ^2.0.3
+  equatable: ^2.0.5
   provider: ^6.0.3
   jiffy: ^5.0.0
   freezed_annotation: ^2.1.0
   json_serializable: ^6.3.1
   google_fonts: ^3.0.1
-  flutter_native_splash: ^2.2.7
-  auto_route: ^4.2.1
+  flutter_native_splash: ^2.2.8
+  auto_route: ^5.0.1
   url_strategy: ^0.2.0
+  injectable: ^1.5.3
+  get_it: ^7.2.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.1
   build_runner: ^2.2.0
-  analyzer: ^4.4.0
+  analyzer: ^4.6.0
   freezed: ^2.1.0+1
-  dart_code_metrics: ^4.17.0
-  auto_route_generator: ^4.2.1
+  dart_code_metrics: ^4.17.1
+  auto_route_generator: ^5.0.1
+  injectable_generator: ^1.5.4
 
 dependency_overrides:
-  analyzer: ^4.4.0
+  analyzer: ^4.6.0
   path: ^1.8.2
   test_api: ^0.4.12
   petitparser: ^5.0.0

@@ -1,32 +1,32 @@
 import 'package:flutter/foundation.dart';
 import 'package:the28awg/components/components.dart';
 import 'package:the28awg/components/theme/theme_builder.dart';
+import 'package:the28awg/di/di.dart';
 
+@singleton
 class ThemeController with ChangeNotifier {
   late ThemeBuilder builder = ThemeBuilder(this);
-  static const ThemeMode defaultThemeMode = ThemeMode.system;
-  static VisualDensity defaultVisualDensity =
-      VisualDensity.adaptivePlatformDensity;
-  static Color defaultColor = const Color(0xFF8E24AA);
+
+  @factoryMethod
+  static Future<ThemeController> create() async {
+    ThemeController themeController = ThemeController();
+    await themeController.loadAll();
+    return themeController;
+  }
 
   Future<void> loadAll() async {
-    _themeMode = defaultThemeMode;
+    _themeMode = ThemeMode.system;
     _platform = defaultTargetPlatform;
-    _visualDensity = defaultVisualDensity;
-    _color = defaultColor;
+    _color = Colors.purple;
   }
 
   Future<void> resetAllToDefaults() async {
-    await setThemeMode(defaultThemeMode, false);
+    await setThemeMode(ThemeMode.system, false);
     await setPlatform(
       defaultTargetPlatform,
       false,
     );
-    await setVisualDensity(
-      defaultVisualDensity,
-      false,
-    );
-    await setColor(defaultColor);
+    await setColor(Colors.purple);
     notifyListeners();
   }
 
@@ -63,22 +63,6 @@ class ThemeController with ChangeNotifier {
     if (value == null) return;
     if (value == _platform) return;
     _platform = value;
-    if (notify) notifyListeners();
-  }
-
-  late VisualDensity _visualDensity;
-
-  VisualDensity get visualDensity => _visualDensity;
-
-  set visualDensityEnum(VisualDensity value) => setVisualDensity(value);
-
-  Future<void> setVisualDensity(
-    VisualDensity? value, [
-    bool notify = true,
-  ]) async {
-    if (value == null) return;
-    if (value == _visualDensity) return;
-    _visualDensity = value;
     if (notify) notifyListeners();
   }
 

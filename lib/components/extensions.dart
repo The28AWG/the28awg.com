@@ -1,4 +1,3 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:the28awg/components/components.dart';
 
 extension NullableStringExtensions on String? {
@@ -118,8 +117,6 @@ extension ContextUtils on BuildContext {
   S get ln => S.of(this);
 
   TextTheme get textTheme => Theme.of(this).textTheme;
-
-  ThemeController get themeController => this.read<ThemeController>();
 
   MediaQueryData get mediaQuery => MediaQuery.of(this);
 

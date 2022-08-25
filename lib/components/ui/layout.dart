@@ -17,6 +17,7 @@ class Layout extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
+          leading: Icon(Icons.home),
           title: title,
           actions: actions,
         ),

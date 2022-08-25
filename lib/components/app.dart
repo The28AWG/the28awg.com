@@ -1,6 +1,7 @@
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:the28awg/components/components.dart';
+import 'package:the28awg/di/di.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -10,11 +11,13 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  final _routes = Routes();
+  final _routes = Routes(authGuard: AuthGuard());
+  late ThemeController _themeController;
 
   @override
   void initState() {
     super.initState();
+    _themeController = getIt<ThemeController>();
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => FlutterNativeSplash.remove(),
     );
@@ -22,7 +25,7 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: context.themeController,
+        animation: _themeController,
         builder: (context, __) => MaterialApp.router(
           routerDelegate: _routes.delegate(),
           routeInformationParser: _routes.defaultRouteParser(),
@@ -35,9 +38,9 @@ class _AppState extends State<App> {
           ],
           supportedLocales: S.delegate.supportedLocales,
           onGenerateTitle: (context) => context.ln.title,
-          theme: context.themeController.light,
-          darkTheme: context.themeController.dark,
-          themeMode: context.themeController.themeMode,
+          theme: _themeController.light,
+          darkTheme: _themeController.dark,
+          themeMode: _themeController.themeMode,
         ),
       );
 }
